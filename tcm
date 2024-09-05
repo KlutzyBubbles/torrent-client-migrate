@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+import os
+from pathlib import Path
+import sys
+from typing import List
+import typer
+from typing_extensions import Annotated
+from rich import print
+
+from _version import __version__
+from config.config import Config
+from connections.utils import get_connection
+from utils import print_verbose
+
+minimum_version = (3, 8, 0)
+if sys.version_info < minimum_version:
+    raise Exception("Requires Python {}.{}.{} or newer".format(*minimum_version))
+
+working_folder = os.path.join(os.path.expanduser('~'), '.tcm')
+config_file = 'config.ini'
+
+tcm = typer.Typer(no_args_is_help=True)
+tcm_config = typer.Typer()
+tcm.add_typer(tcm_config, name='config')
+
+config_input = typer.Option(os.path.join(working_folder, config_file), '--config', '-c', help="Config file location")
+verbose_input = typer.Option(False, '--verbose', '-v', help="Enable verbose messages")
+config_obj: Config = None
+
+@tcm.callback(invoke_without_command=True)
+def config_callback(
+    ctx: typer.Context,
+    config: Path = config_input,
+    verbose: bool = verbose_input):
+    print("[bold white]Torrent Client Migrate[/bold white] [cyan]v{}[/cyan]".format(__version__))
+
+@tcm.command()
+def migrate(
+    source: Annotated[str, typer.Argument(help="Source key")],
+    destination: Annotated[str, typer.Argument(help="Destination key")],
+    filter_tags: Annotated[List[str], typer.Option('--filter-tag', '-t', help="Filter source by tags")] = [],
+    confirm: Annotated[bool, typer.Option('--confirm', '-C', help="Prompt for confirmation before proceeding")] = False,
+    config: Path = config_input,
+    verbose: bool = verbose_input):
+    config_obj = Config(config, verbose)
+    print_verbose('Checking for source and dest keys', verbose)
+    if source not in config_obj.connections:
+        print('[red]Cannot find source key, check the sections in the config[/red]')
+        raise typer.Exit()
+    if destination not in config_obj.connections:
+        print('[red]Cannot find destination key, check the sections in the config[/red]')
+        raise typer.Exit()
+    source_connection = get_connection(config_obj.connections[source], config_obj)
+    dest_connection = get_connection(config_obj.connections[destination], config_obj)
+    source_torrents = source_connection.get_torrents(filter_tags)
+    dest_torrents = dest_connection.get_torrents()
+    dest_hashes = [torrent.hash for torrent in dest_torrents]
+    confirm_count = 0
+    for torrent in source_torrents:
+        if torrent.hash not in dest_hashes:
+            confirm_count += 1
+    print('{} torrents will be migrated'.format(confirm_count))
+    if confirm:
+        continue_migrate = typer.confirm('Do you want to continue with the migration?')
+        if not continue_migrate:
+            raise typer.Exit()
+    if config_obj.connections[source].type == 'qbittorrent':
+        source_files = source_connection.get_torrent_files(source_torrents)
+        dest_connection.add_torrents(source_torrents, dest_torrents, config_obj.connections[source], source_files)
+    else:
+        dest_connection.add_torrents(source_torrents, dest_torrents, config_obj.connections[source])
+    print('[bold green]Done![/bold green] :thumbs_up:')
+
+# TODO: Set config via CLI
+#@tcm_config.command('set')
+#def config_view(
+#    config: Annotated[Optional[Path], typer.Option(help="Config file location")] = os.path.join(working_folder, config_file)):
+#    config_obj = Config(config)
+#    print('Set)')
+
+@tcm_config.callback(invoke_without_command=True)
+def config_callback(
+    ctx: typer.Context,
+    config: Path = config_input,
+    verbose: bool = verbose_input):
+    if ctx.invoked_subcommand is None:
+        config_obj = Config(config, verbose)
+        config_obj.print_config()
+
+if __name__ == "__main__":
+    tcm()

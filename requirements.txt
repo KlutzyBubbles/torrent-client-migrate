@@ -1,0 +1,4 @@
+qbittorrent-api~=2024.8.65
+transmission-rpc~=7.0.11
+typer~=0.12.5
+packaging>=24.1

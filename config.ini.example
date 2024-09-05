@@ -1,0 +1,19 @@
+[global]
+skip_check = False
+add_paused = True
+
+[node1]
+type = qbittorrent
+host = 127.0.0.1
+port = 8080
+username = admin
+password = adminadmin
+
+[node2]
+type = transmission
+protocol = http
+host = 127.0.0.1
+port = 9091
+url_path = /transmission/
+torrent_path = ~/.config/transmission-daemon/torrents
+save_path = /mnt/files/downloads
