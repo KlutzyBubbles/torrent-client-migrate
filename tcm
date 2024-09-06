@@ -44,6 +44,9 @@ def migrate(
     verbose: bool = verbose_input):
     config_obj = Config(config, verbose)
     print_verbose('Checking for source and dest keys', verbose)
+    if source == destination:
+        print('[red]Cannot migrate to/from the same connection[/red]')
+        raise typer.Exit()
     if source not in config_obj.connections:
         print('[red]Cannot find source key, check the sections in the config[/red]')
         raise typer.Exit()
