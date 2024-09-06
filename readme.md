@@ -17,6 +17,12 @@ python3 -m pip install -r requirements.txt
 python3 tcm
 ```
 
+You can also install a specific version
+
+```sh
+git clone https://github.com/KlutzyBubbles/torrent-client-migrate.git --branch vX.X.X
+```
+
 ## Configuration
 
 On first run, a config file is generated. An example of a full config can be found in `config.ini.example` or looks like
