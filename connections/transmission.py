@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from pathlib import Path
 import typer
 from config.config import Config
@@ -100,8 +101,3 @@ class TransmissionConnection(Connection):
                 else:
                     print('[red]Unable to find torrent file for {} at path:[/red] {}'.format(torrent.name, torrent_path))
         print_verbose('{}:add_torrents()'.format(self.config.key), self.global_config.verbose)
-        #hash_names = {}
-        #for torrent in existing:
-        #    hash_names[torrent.hash] = torrent.name
-        # TODO: Add transmission torrents
-        pass

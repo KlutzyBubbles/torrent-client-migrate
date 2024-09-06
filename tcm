@@ -32,7 +32,7 @@ def config_callback(
     ctx: typer.Context,
     config: Path = config_input,
     verbose: bool = verbose_input):
-    print("[bold white]Torrent Client Migrate[/bold white] [cyan]v{}[/cyan]".format(__version__))
+    print("[white]Torrent Client Migrate[/white] [bold cyan]v{}[/bold cyan]".format(__version__))
 
 @tcm.command()
 def migrate(

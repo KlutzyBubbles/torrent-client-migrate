@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import configparser
 import os
 import typer
@@ -42,7 +43,7 @@ class Config:
                 if section == 'global':
                     try:
                         self.skip_check = config.getboolean(section, 'skip_check', fallback=False)
-                        self.add_paused = config.getboolean(section, 'add_paused', fallback=False)
+                        self.add_paused = config.getboolean(section, 'add_paused', fallback=True)
                     except:
                         print('[red]Global options could not be loaded[/red]')
                         continue_default = typer.confirm('Do you want to continue with defaults')

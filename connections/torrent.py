@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from typing import Literal
 
 from qbittorrentapi import TorrentDictionary

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import configparser
 from typing import Literal
 from rich import print

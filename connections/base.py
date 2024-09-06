@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from abc import abstractmethod
 from config.config import Config
 from config.connection import ConnectionConfig
