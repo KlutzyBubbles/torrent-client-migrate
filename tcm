@@ -58,6 +58,7 @@ def migrate(
     confirm_count = 0
     for torrent in source_torrents:
         if torrent.hash not in dest_hashes:
+            print_verbose('{} ({}) will be migrated'.format(torrent.name, torrent.hash), verbose)
             confirm_count += 1
     print('{} torrents will be migrated'.format(confirm_count))
     if confirm:
